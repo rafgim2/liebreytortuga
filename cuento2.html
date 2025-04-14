@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuento Interactivo: La liebre y la tortuga</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #eef;
+      padding: 20px;
+      margin: 0;
+    }
+    .contenedor {
+      max-width: 700px;
+      margin: auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    /* Estilos para la sección de historia */
+    #storySection img {
+      width: 100%;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    #storyContent {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+    #storyButton {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    /* Estilos para el quiz */
+    .pregunta {
+      font-size: 1.3em;
+      margin-bottom: 15px;
+    }
+    .opciones button {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 1em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .correct { background-color: lightgreen; }
+    .incorrect { background-color: lightcoral; }
+    /* Estilos para la línea de carrera */
+    #raceTrack {
+      margin-top: 40px;
+      position: relative;
+      height: 100px;
+    }
+    #raceTrack .track-line {
+      height: 4px;
+      background: gray;
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+    }
+    /* Posición de los personajes */
+    #tortuga, #liebre {
+      position: absolute;
+      width: 60px;
+    }
+    #tortuga { top: 0; left: 0; }
+    #liebre { top: 50px; left: 0; }
+  </style>
+</head>
+<body>
+  <div class="contenedor">
+    <!-- Sección de historia -->
+    <div id="storySection">
+      <img id="storyImage" src="" alt="Historia" />
+      <div id="storyContent"></div>
+      <button id="storyButton">Continuar</button>
+    </div>
+    
+    <!-- Sección de preguntas y carrera -->
+    <div id="quizSection" style="display:none;">
+      <div id="questionContainer"></div>
+      <div id="optionsContainer" class="opciones"></div>
+      <div id="raceTrack">
+        <div class="track-line"></div>
+        <img id="tortuga" src="tortuga.png" alt="Tortuga" />
+        <img id="liebre" src="liebre.png" alt="Liebre" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Audios para acierto y error (usa .wav o .mp3 según lo que tengas) -->
+  <audio id="audioCorrect" src="acierto.wav"></audio>
+  <audio id="audioError" src="error.wav"></audio>
+
+  <script>
+    /*********************** SECCIÓN DE HISTORIA ************************/
+    const storyParts = [
+      {
+        texto: "Había una vez una liebre muy rápida y una tortuga muy perseverante.",
+        imagen: "file_00000000c2546246ac36958dc6095f72.png"
+      },
+      {
+        texto: "Un día, decidieron hacer una carrera por la ciudad moderna.",
+        imagen: "file_00000000b8b06246bd0ca91467cead1d.png"
+      },
+      {
+        texto: "La liebre confiaba en su velocidad y se detuvo a descansar.",
+        imagen: "file_0000000055046246adfe5788dc7e0abb.png"
+      },
+      {
+        texto: "La tortuga, aunque despacio, siguió avanzando sin detenerse.",
+        imagen: "file_00000000e7bc6246a0d87879b2cdb303.png"
+      },
+      {
+        texto: "Al final, la tortuga ganó la carrera. ¡Bravo por ella!",
+        imagen: "file_00000000d52462469a097e024c945fb1.png"
+      }
+    ];
+
+    let currentStoryIndex = 0;
+    const storyContentDiv = document.getElementById("storyContent");
+    const storyImage = document.getElementById("storyImage");
+    const storyButton = document.getElementById("storyButton");
+
+    function showStoryPart() {
+      storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
+      storyImage.src = storyParts[currentStoryIndex].imagen;
+      storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
+    }
+
+    storyButton.addEventListener("click", function() {
+      currentStoryIndex++;
+      if (currentStoryIndex < storyParts.length) {
+        showStoryPart();
+      } else {
+        document.getElementById("storySection").style.display = "none";
+        document.getElementById("quizSection").style.display = "block";
+        showQuestion(currentQuestion);
+      }
+    });
+
+    showStoryPart();
+
+    /*********************** SECCIÓN DE PREGUNTAS Y CARRERA ************************/
+    const questions = [
+      {
+        pregunta: "1. ¿Quién corría con la tortuga?",
+        opciones: [
+          { texto: "La liebre", correcta: true },
+          { texto: "El ratón", correcta: false },
+          { texto: "El gato", correcta: false },
+          { texto: "El perro", correcta: false }
+        ]
+      },
+      {
+        pregunta: "2. ¿Qué animal era más rápido?",
+        opciones: [
+          { texto: "La liebre", correcta: true },
+          { texto: "La tortuga", correcta: false },
+          { texto: "El pez", correcta: false },
+          { texto: "El pájaro", correcta: false }
+        ]
+      },
+      {
+        pregunta: "3. ¿Qué hizo la liebre en la carrera?",
+        opciones: [
+          { texto: "Se durmió", correcta: true },
+          { texto: "Corrió más", correcta: false },
+          { texto: "Saltó", correcta: false },
+          { texto: "Voló", correcta: false }
+        ]
+      },
+      {
+        pregunta: "4. ¿Qué hizo la tortuga?",
+        opciones: [
+          { texto: "Siguió sin parar", correcta: true },
+          { texto: "Se durmió", correcta: false },
+          { texto: "Se escondió", correcta: false },
+          { texto: "Saltó", correcta: false }
+        ]
+      },
+      {
+        pregunta: "5. ¿Quién ganó la carrera?",
+        opciones: [
+          { texto: "La tortuga", correcta: true },
+          { texto: "La liebre", correcta: false },
+          { texto: "El juez", correcta: false },
+          { texto: "Nadie", correcta: false }
+        ]
+      },
+      {
+        pregunta: "6. ¿Por qué ganó la tortuga?",
+        opciones: [
+          { texto: "Fue constante", correcta: true },
+          { texto: "Corrió muy rápido", correcta: false },
+          { texto: "Saltó mucho", correcta: false },
+          { texto: "Durmió bien", correcta: false }
+        ]
+      },
+      {
+        pregunta: "7. ¿Qué aprendemos de esta historia?",
+        opciones: [
+          { texto: "Hay que seguir sin rendirse", correcta: true },
+          { texto: "Hay que dormir mucho", correcta: false },
+          { texto: "Hay que ser rápido", correcta: false },
+          { texto: "Hay que saltar alto", correcta: false }
+        ]
+      },
+      {
+        pregunta: "8. ¿Cómo se sentía la liebre al final?",
+        opciones: [
+          { texto: "Sorprendida", correcta: true },
+          { texto: "Feliz", correcta: false },
+          { texto: "Tranquila", correcta: false },
+          { texto: "Contenta", correcta: false }
+        ]
+      },
+      {
+        pregunta: "9. ¿Cómo se sentía la tortuga al ganar?",
+        opciones: [
+          { texto: "Feliz", correcta: true },
+          { texto: "Triste", correcta: false },
+          { texto: "Enfadada", correcta: false },
+          { texto: "Dormida", correcta: false }
+        ]
+      },
+      {
+        pregunta: "10. ¿Qué valor muestra la tortuga?",
+        opciones: [
+          { texto: "Constancia", correcta: true },
+          { texto: "Rapidez", correcta: false },
+          { texto: "Pereza", correcta: false },
+          { texto: "Tristeza", correcta: false }
+        ]
+      }
+    ];
+
+    let currentQuestion = 0;
+    let totalQuestions = questions.length;
+    let tortugaPos = 0;
+    let liebrePos = 0;
+    const trackWidth = 600; // Ancho del recorrido
+
+    function showQuestion(index) {
+      const questionContainer = document.getElementById("questionContainer");
+      const optionsContainer = document.getElementById("optionsContainer");
+      questionContainer.innerHTML = "";
+      optionsContainer.innerHTML = "";
+
+      if (index >= questions.length) {
+        questionContainer.innerHTML = "<h2>¡Fin del juego!</h2>";
+        if (tortugaPos >= totalQuestions) {
+          questionContainer.innerHTML += "<p>¡La tortuga ha ganado la carrera!</p>";
+        } else {
+          questionContainer.innerHTML += "<p>¡La liebre ha ganado la carrera!</p>";
+        }
+        return;
+      }
+
+      const q = questions[index];
+      questionContainer.innerHTML = "<p class='pregunta'>" + q.pregunta + "</p>";
+
+      q.opciones.forEach(opcion => {
+        const button = document.createElement("button");
+        button.innerText = opcion.texto;
+        button.addEventListener("click", () => checkAnswer(button, opcion.correcta));
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, isCorrect) {
+      const tortuga = document.getElementById("tortuga");
+      const liebre = document.getElementById("liebre");
+
+      if (isCorrect) {
+        button.classList.add("correct");
+        document.getElementById("audioCorrect").play();
+        document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
+
+        // Avanzar la tortuga
+        tortugaPos++;
+        let porc = (tortugaPos / totalQuestions) * trackWidth;
+        tortuga.style.left = porc + "px";
+
+        setTimeout(() => {
+          currentQuestion++;
+          showQuestion(currentQuestion);
+        }, 1000);
+      } else {
+        button.classList.add("incorrect");
+        button.disabled = true;
+        document.getElementById("audioError").play();
+
+        // Avanzar la liebre
+        liebrePos++;
+        let porc = (liebrePos / totalQuestions) * trackWidth;
+        liebre.style.left = porc + "px";
+      }
+    }
+  </script>
+</body>
+</html>
