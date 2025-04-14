@@ -57,7 +57,9 @@
       margin-top: 40px;
       position: relative;
       height: 100px;
-      border: 2px dashed transparent; /* Para dar espacio si se quiere agregar más estilo */
+      /* Puedes ajustar el ancho si lo deseas */
+      width: 600px;
+      border: 2px dashed transparent;
     }
     #raceTrack .track-line {
       height: 4px;
@@ -67,7 +69,7 @@
       left: 0;
       right: 0;
     }
-    /* Línea de meta */
+    /* Línea de meta (roja) */
     #finishLine {
       position: absolute;
       right: 0;
@@ -136,7 +138,7 @@
 
     function showStoryPart() {
       storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
-      // Evitar caché agregando parámetro
+      // Para evitar caché, se añade un parámetro
       storyImage.src = storyParts[currentStoryIndex].imagen + "?v=" + new Date().getTime();
       storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
     }
@@ -247,11 +249,12 @@
       }
     ];
 
+    // Variables para llevar la cuenta de movimientos (cada pregunta equivale a 1 movimiento)
     let currentQuestion = 0;
-    let totalQuestions = questions.length;
+    const totalMoves = 10; // Se terminará el juego al alcanzar 10 movimientos en cualquiera de las dos
     let tortugaPos = 0;
     let liebrePos = 0;
-    const trackWidth = 600; // Ancho del recorrido
+    const trackWidth = 600; // Debe coincidir con el ancho de #raceTrack
 
     function showQuestion(index) {
       const questionContainer = document.getElementById("questionContainer");
@@ -259,17 +262,9 @@
       questionContainer.innerHTML = "";
       optionsContainer.innerHTML = "";
 
-      // Si ya se han respondido 10 preguntas, se llega a la meta
-      if (index >= questions.length) {
-        // Verificar quién ha avanzado más:
-        if (tortugaPos >= totalQuestions) {
-          document.getElementById("audioSuccess").play();
-          questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
-        } else {
-          questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
-          optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
-          document.getElementById("resetButton").addEventListener("click", resetQuiz);
-        }
+      // Si se han respondido todas las preguntas o alguien llegó a la meta, termina el juego
+      if (index >= questions.length || tortugaPos >= totalMoves || liebrePos >= totalMoves) {
+        finishGame();
         return;
       }
 
@@ -292,25 +287,55 @@
         button.classList.add("correct");
         document.getElementById("audioCorrect").play();
         document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
-
-        // Avanzar la tortuga
         tortugaPos++;
-        let porc = (tortugaPos / totalQuestions) * trackWidth;
-        tortuga.style.left = porc + "px";
-
+        let pos = (tortugaPos / totalMoves) * trackWidth;
+        tortuga.style.left = pos + "px";
         setTimeout(() => {
-          currentQuestion++;
-          showQuestion(currentQuestion);
+          // Si la tortuga ya llegó a la meta, termina el juego
+          if (tortugaPos >= totalMoves) {
+            finishGame();
+          } else {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+          }
         }, 1000);
       } else {
         button.classList.add("incorrect");
         button.disabled = true;
         document.getElementById("audioError").play();
-
-        // Avanzar la liebre
         liebrePos++;
-        let porc = (liebrePos / totalQuestions) * trackWidth;
-        liebre.style.left = porc + "px";
+        let pos = (liebrePos / totalMoves) * trackWidth;
+        liebre.style.left = pos + "px";
+        // Si la liebre ya llegó a la meta, termina el juego inmediatamente
+        if (liebrePos >= totalMoves) {
+          finishGame();
+        }
+      }
+    }
+
+    function finishGame() {
+      const questionContainer = document.getElementById("questionContainer");
+      const optionsContainer = document.getElementById("optionsContainer");
+      // Desactivar todos los botones
+      document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
+      
+      if (tortugaPos >= totalMoves) {
+        document.getElementById("audioSuccess").play();
+        questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
+      } else if (liebrePos >= totalMoves) {
+        questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
+        optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
+        document.getElementById("resetButton").addEventListener("click", resetQuiz);
+      } else {
+        // Si se contestaron todas las preguntas sin que alguien llegara a 10, se compara quién avanzó más.
+        if (tortugaPos >= liebrePos) {
+          document.getElementById("audioSuccess").play();
+          questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. La perseverancia paga.</p>";
+        } else {
+          questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
+          optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
+          document.getElementById("resetButton").addEventListener("click", resetQuiz);
+        }
       }
     }
 
