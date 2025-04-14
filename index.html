@@ -4,10 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Cuento Interactivo: La liebre y la tortuga</title>
+  
+  <!-- Pre-cargar imágenes -->
+  <link rel="preload" as="image" href="0.png" />
+  <link rel="preload" as="image" href="1.png" />
+  <link rel="preload" as="image" href="2.png" />
+  <link rel="preload" as="image" href="3.png" />
+  <link rel="preload" as="image" href="4.png" />
+  <link rel="preload" as="image" href="5.png" />
+  <link rel="preload" as="image" href="6.png" />
+  <link rel="preload" as="image" href="7.png" />
+  
+  <!-- Pre-cargar audios -->
+  <link rel="preload" as="audio" href="acierto.wav" />
+  <link rel="preload" as="audio" href="error.wav" />
+  <link rel="preload" as="audio" href="exito.mp3" />
+  <link rel="preload" as="audio" href="musica.mp3" />
+  <link rel="preload" as="audio" href="silbato.mp3" />
+
   <style>
     body {
       font-family: sans-serif;
-      background-color: lightblue; /* Fondo azul claro */
+      background-color: lightblue;
       padding: 20px;
       margin: 0;
     }
@@ -37,7 +55,7 @@
     }
     /* Estilos para la sección de historia */
     #storySection img {
-      width: 50%; /* Imágenes a la mitad del tamaño original */
+      width: 50%;
       display: block;
       margin-left: auto;
       margin-right: auto;
@@ -141,12 +159,21 @@
     </div>
   </div>
 
-  <!-- Audios para acierto, error, éxito, música de fondo y silbato -->
-  <audio id="audioCorrect" src="acierto.wav"></audio>
-  <audio id="audioError" src="error.wav"></audio>
-  <audio id="audioSuccess" src="exito.mp3"></audio>
-  <audio id="backgroundMusic" src="musica.mp3" loop></audio>
-  <audio id="whistle" src="silbato.mp3"></audio>
+  <!-- Audios con preload="auto" -->
+  <audio id="audioCorrect" src="acierto.wav" preload="auto"></audio>
+  <audio id="audioError" src="error.wav" preload="auto"></audio>
+  <audio id="audioSuccess" src="exito.mp3" preload="auto"></audio>
+  <audio id="backgroundMusic" src="musica.mp3" preload="auto" loop></audio>
+  <audio id="whistle" src="silbato.mp3" preload="auto"></audio>
+
+  <!-- Opcional: Pre-cargar imágenes con JavaScript -->
+  <script>
+    const imageSources = ["0.png", "1.png", "2.png", "3.png", "4.png", "5.png", "6.png", "7.png"];
+    imageSources.forEach(src => {
+      const img = new Image();
+      img.src = src;
+    });
+  </script>
 
   <script>
     // Iniciar el juego y reproducir la música al pulsar "Empezar"
@@ -290,7 +317,6 @@
       }
     ];
 
-    // Variables para llevar la cuenta de movimientos (cada pregunta equivale a 1 movimiento)
     let currentQuestion = 0;
     const totalMoves = 10; // Se termina el juego al alcanzar 10 movimientos en cualquiera de las dos
     let tortugaPos = 0;
@@ -303,7 +329,6 @@
       questionContainer.innerHTML = "";
       optionsContainer.innerHTML = "";
 
-      // Si se han respondido todas las preguntas o alguien llegó a la meta, termina el juego
       if (index >= questions.length || tortugaPos >= totalMoves || liebrePos >= totalMoves) {
         finishGame();
         return;
@@ -357,15 +382,12 @@
       const optionsContainer = document.getElementById("optionsContainer");
       document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
       
-      // Si la tortuga gana
       if (tortugaPos >= totalMoves) {
         document.getElementById("audioSuccess").play();
         questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
         optionsContainer.innerHTML = "<button id='resetButton'>Empezar de nuevo</button>";
         document.getElementById("resetButton").addEventListener("click", restartGame);
-      }
-      // Si la liebre gana
-      else if (liebrePos >= totalMoves) {
+      } else if (liebrePos >= totalMoves) {
         questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo!</p>";
         optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
         document.getElementById("resetButton").addEventListener("click", resetQuiz);
@@ -384,7 +406,6 @@
     }
 
     function resetQuiz() {
-      // Reproducir el sonido de silbato al reiniciar el quiz
       document.getElementById("whistle").play();
       currentQuestion = 0;
       tortugaPos = 0;
@@ -395,19 +416,15 @@
     }
 
     function restartGame() {
-      // Reproducir el sonido de silbato al reiniciar el juego
       document.getElementById("whistle").play();
-      // Resetear variables para reiniciar toda la experiencia
       currentQuestion = 0;
       currentStoryIndex = 0;
       tortugaPos = 0;
       liebrePos = 0;
       document.getElementById("tortuga").style.left = "0px";
       document.getElementById("liebre").style.left = "0px";
-      // Mostrar la pantalla de introducción y ocultar el contenedor
       document.getElementById("introSection").style.display = "block";
       document.querySelector(".contenedor").style.display = "none";
-      // Reiniciar la historia
       showStoryPart();
     }
   </script>
