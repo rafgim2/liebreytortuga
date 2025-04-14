@@ -131,14 +131,16 @@
     const storyButton = document.getElementById("storyButton");
 
     function showStoryPart() {
+      // Mostrar el texto de la parte actual y asignar la imagen correspondiente
       storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
-      // Añadimos un parámetro de cache-busting para evitar problemas de caché.
-      storyImage.src = storyParts[currentStoryIndex].imagen + "?v=" + new Date().getTime();
+      storyImage.src = storyParts[currentStoryIndex].imagen;
+      // Cambiar el texto del botón en la última parte
       storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
     }
 
     storyButton.addEventListener("click", function() {
       currentStoryIndex++;
+      // Si quedan partes de la historia, mostrarlas; de lo contrario, iniciar el quiz
       if (currentStoryIndex < storyParts.length) {
         showStoryPart();
       } else {
