@@ -141,11 +141,12 @@
     </div>
   </div>
 
-  <!-- Audios para acierto, error, éxito y música de fondo -->
+  <!-- Audios para acierto, error, éxito, música de fondo y silbato -->
   <audio id="audioCorrect" src="acierto.wav"></audio>
   <audio id="audioError" src="error.wav"></audio>
   <audio id="audioSuccess" src="exito.mp3"></audio>
   <audio id="backgroundMusic" src="musica.mp3" loop></audio>
+  <audio id="whistle" src="silbato.mp3"></audio>
 
   <script>
     // Iniciar el juego y reproducir la música al pulsar "Empezar"
@@ -188,6 +189,8 @@
       } else {
         document.getElementById("storySection").style.display = "none";
         document.getElementById("quizSection").style.display = "block";
+        // Reproducir el sonido de silbato al iniciar las preguntas
+        document.getElementById("whistle").play();
         showQuestion(currentQuestion);
       }
     });
@@ -354,10 +357,15 @@
       const optionsContainer = document.getElementById("optionsContainer");
       document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
       
+      // Si la tortuga gana
       if (tortugaPos >= totalMoves) {
         document.getElementById("audioSuccess").play();
         questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
-      } else if (liebrePos >= totalMoves) {
+        optionsContainer.innerHTML = "<button id='resetButton'>Empezar de nuevo</button>";
+        document.getElementById("resetButton").addEventListener("click", restartGame);
+      }
+      // Si la liebre gana
+      else if (liebrePos >= totalMoves) {
         questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo!</p>";
         optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
         document.getElementById("resetButton").addEventListener("click", resetQuiz);
@@ -365,6 +373,8 @@
         if (tortugaPos >= liebrePos) {
           document.getElementById("audioSuccess").play();
           questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. La perseverancia paga.</p>";
+          optionsContainer.innerHTML = "<button id='resetButton'>Empezar de nuevo</button>";
+          document.getElementById("resetButton").addEventListener("click", restartGame);
         } else {
           questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo!</p>";
           optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
@@ -374,12 +384,31 @@
     }
 
     function resetQuiz() {
+      // Reproducir el sonido de silbato al reiniciar el quiz
+      document.getElementById("whistle").play();
       currentQuestion = 0;
       tortugaPos = 0;
       liebrePos = 0;
       document.getElementById("tortuga").style.left = "0px";
       document.getElementById("liebre").style.left = "0px";
       showQuestion(currentQuestion);
+    }
+
+    function restartGame() {
+      // Reproducir el sonido de silbato al reiniciar el juego
+      document.getElementById("whistle").play();
+      // Resetear variables para reiniciar toda la experiencia
+      currentQuestion = 0;
+      currentStoryIndex = 0;
+      tortugaPos = 0;
+      liebrePos = 0;
+      document.getElementById("tortuga").style.left = "0px";
+      document.getElementById("liebre").style.left = "0px";
+      // Mostrar la pantalla de introducción y ocultar el contenedor
+      document.getElementById("introSection").style.display = "block";
+      document.querySelector(".contenedor").style.display = "none";
+      // Reiniciar la historia
+      showStoryPart();
     }
   </script>
 </body>
