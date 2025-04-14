@@ -90,13 +90,13 @@
       <div id="optionsContainer" class="opciones"></div>
       <div id="raceTrack">
         <div class="track-line"></div>
-        <img id="tortuga" src="tortuga.png" alt="Tortuga" />
-        <img id="liebre" src="liebre.png" alt="Liebre" />
+        <img id="tortuga" src="6.png" alt="Tortuga" />
+        <img id="liebre" src="7.png" alt="Liebre" />
       </div>
     </div>
   </div>
 
-  <!-- Audios para acierto y error -->
+  <!-- Audios para acierto y error (usa .wav o .mp3 según lo que tengas) -->
   <audio id="audioCorrect" src="acierto.wav"></audio>
   <audio id="audioError" src="error.wav"></audio>
 
@@ -131,16 +131,13 @@
     const storyButton = document.getElementById("storyButton");
 
     function showStoryPart() {
-      // Mostrar el texto de la parte actual y asignar la imagen correspondiente
       storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
       storyImage.src = storyParts[currentStoryIndex].imagen;
-      // Cambiar el texto del botón en la última parte
       storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
     }
 
     storyButton.addEventListener("click", function() {
       currentStoryIndex++;
-      // Si quedan partes de la historia, mostrarlas; de lo contrario, iniciar el quiz
       if (currentStoryIndex < storyParts.length) {
         showStoryPart();
       } else {
@@ -288,7 +285,7 @@
         document.getElementById("audioCorrect").play();
         document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
 
-        // Avanza la tortuga
+        // Avanzar la tortuga
         tortugaPos++;
         let porc = (tortugaPos / totalQuestions) * trackWidth;
         tortuga.style.left = porc + "px";
@@ -302,7 +299,7 @@
         button.disabled = true;
         document.getElementById("audioError").play();
 
-        // Avanza la liebre
+        // Avanzar la liebre
         liebrePos++;
         let porc = (liebrePos / totalQuestions) * trackWidth;
         liebre.style.left = porc + "px";
