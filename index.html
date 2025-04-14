@@ -358,7 +358,7 @@
         document.getElementById("audioSuccess").play();
         questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
       } else if (liebrePos >= totalMoves) {
-        questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
+        questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo!</p>";
         optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
         document.getElementById("resetButton").addEventListener("click", resetQuiz);
       } else {
@@ -366,7 +366,7 @@
           document.getElementById("audioSuccess").play();
           questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. La perseverancia paga.</p>";
         } else {
-          questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
+          questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo!</p>";
           optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
           document.getElementById("resetButton").addEventListener("click", resetQuiz);
         }
