@@ -57,6 +57,7 @@
       margin-top: 40px;
       position: relative;
       height: 100px;
+      border: 2px dashed transparent; /* Para dar espacio si se quiere agregar más estilo */
     }
     #raceTrack .track-line {
       height: 4px;
@@ -66,6 +67,15 @@
       left: 0;
       right: 0;
     }
+    /* Línea de meta */
+    #finishLine {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: red;
+    }
     /* Posición de los personajes */
     #tortuga, #liebre {
       position: absolute;
@@ -73,6 +83,13 @@
     }
     #tortuga { top: 0; left: 0; }
     #liebre { top: 50px; left: 0; }
+    /* Botón de reiniciar */
+    #resetButton {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -90,39 +107,26 @@
       <div id="optionsContainer" class="opciones"></div>
       <div id="raceTrack">
         <div class="track-line"></div>
+        <div id="finishLine"></div>
         <img id="tortuga" src="6.png" alt="Tortuga" />
         <img id="liebre" src="7.png" alt="Liebre" />
       </div>
     </div>
   </div>
 
-  <!-- Audios para acierto y error (usa .wav o .mp3 según lo que tengas) -->
+  <!-- Audios para acierto, error y éxito -->
   <audio id="audioCorrect" src="acierto.wav"></audio>
   <audio id="audioError" src="error.wav"></audio>
+  <audio id="audioSuccess" src="exito.wav"></audio>
 
   <script>
     /*********************** SECCIÓN DE HISTORIA ************************/
     const storyParts = [
-      {
-        texto: "Había una vez una liebre muy rápida y una tortuga muy perseverante.",
-        imagen: "1.png"
-      },
-      {
-        texto: "Un día, decidieron hacer una carrera por la ciudad moderna.",
-        imagen: "2.png"
-      },
-      {
-        texto: "La liebre confiaba en su velocidad y se detuvo a descansar.",
-        imagen: "3.png"
-      },
-      {
-        texto: "La tortuga, aunque despacio, siguió avanzando sin detenerse.",
-        imagen: "4.png"
-      },
-      {
-        texto: "Al final, la tortuga ganó la carrera. ¡Bravo por ella!",
-        imagen: "5.png"
-      }
+      { texto: "Había una vez una liebre muy rápida y una tortuga muy perseverante.", imagen: "1.png" },
+      { texto: "Un día, decidieron hacer una carrera por la ciudad moderna.", imagen: "2.png" },
+      { texto: "La liebre confiaba en su velocidad y se detuvo a descansar.", imagen: "3.png" },
+      { texto: "La tortuga, aunque despacio, siguió avanzando sin detenerse.", imagen: "4.png" },
+      { texto: "Al final, la tortuga ganó la carrera. ¡Bravo por ella!", imagen: "5.png" }
     ];
 
     let currentStoryIndex = 0;
@@ -132,7 +136,8 @@
 
     function showStoryPart() {
       storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
-      storyImage.src = storyParts[currentStoryIndex].imagen;
+      // Evitar caché agregando parámetro
+      storyImage.src = storyParts[currentStoryIndex].imagen + "?v=" + new Date().getTime();
       storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
     }
 
@@ -146,7 +151,6 @@
         showQuestion(currentQuestion);
       }
     });
-
     showStoryPart();
 
     /*********************** SECCIÓN DE PREGUNTAS Y CARRERA ************************/
@@ -255,12 +259,16 @@
       questionContainer.innerHTML = "";
       optionsContainer.innerHTML = "";
 
+      // Si ya se han respondido 10 preguntas, se llega a la meta
       if (index >= questions.length) {
-        questionContainer.innerHTML = "<h2>¡Fin del juego!</h2>";
+        // Verificar quién ha avanzado más:
         if (tortugaPos >= totalQuestions) {
-          questionContainer.innerHTML += "<p>¡La tortuga ha ganado la carrera!</p>";
+          document.getElementById("audioSuccess").play();
+          questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. Con constancia y perseverancia se logran grandes cosas.</p>";
         } else {
-          questionContainer.innerHTML += "<p>¡La liebre ha ganado la carrera!</p>";
+          questionContainer.innerHTML = "<h2>¡Fin del juego!</h2><p>La liebre ha ganado la carrera. ¡Inténtalo de nuevo para demostrar tus valores!</p>";
+          optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
+          document.getElementById("resetButton").addEventListener("click", resetQuiz);
         }
         return;
       }
@@ -304,6 +312,15 @@
         let porc = (liebrePos / totalQuestions) * trackWidth;
         liebre.style.left = porc + "px";
       }
+    }
+
+    function resetQuiz() {
+      currentQuestion = 0;
+      tortugaPos = 0;
+      liebrePos = 0;
+      document.getElementById("tortuga").style.left = "0px";
+      document.getElementById("liebre").style.left = "0px";
+      showQuestion(currentQuestion);
     }
   </script>
 </body>
