@@ -7,21 +7,40 @@
   <style>
     body {
       font-family: sans-serif;
-      background-color: #eef;
+      background-color: lightblue; /* Fondo azul claro */
       padding: 20px;
       margin: 0;
     }
+    /* Sección de introducción */
+    #introSection {
+      text-align: center;
+      margin-top: 100px;
+    }
+    #introSection h1 {
+      font-size: 3em;
+      margin-bottom: 20px;
+    }
+    #introSection button {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    /* Contenedor principal oculto hasta iniciar el juego */
     .contenedor {
+      display: none;
       max-width: 700px;
       margin: auto;
       background-color: #fff;
       padding: 20px;
       border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
     }
     /* Estilos para la sección de historia */
     #storySection img {
-      width: 50%; /* Se reduce el tamaño de las imágenes a la mitad */
+      width: 50%; /* Imágenes a la mitad del tamaño original */
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
       border-radius: 8px;
       margin-bottom: 15px;
     }
@@ -57,7 +76,6 @@
       margin-top: 40px;
       position: relative;
       height: 100px;
-      /* Puedes ajustar el ancho si lo deseas */
       width: 600px;
       border: 2px dashed transparent;
     }
@@ -95,6 +113,12 @@
   </style>
 </head>
 <body>
+  <!-- Sección de introducción -->
+  <div id="introSection">
+    <h1>La liebre y la tortuga</h1>
+    <button id="startButton">Empezar</button>
+  </div>
+
   <div class="contenedor">
     <!-- Sección de historia -->
     <div id="storySection">
@@ -120,9 +144,21 @@
   <audio id="audioCorrect" src="acierto.wav"></audio>
   <audio id="audioError" src="error.wav"></audio>
   <audio id="audioSuccess" src="exito.wav"></audio>
-  <audio id="backgroundMusic" src="musica.mp3" loop autoplay></audio>
+  <audio id="backgroundMusic" src="musica.mp3" loop></audio>
 
   <script>
+    // Iniciar el juego y reproducir la música al pulsar "Empezar"
+    document.getElementById("startButton").addEventListener("click", function() {
+      const bgMusic = document.getElementById("backgroundMusic");
+      bgMusic.play().catch(function(error) {
+        console.error("Error al reproducir la música: ", error);
+      });
+      // Ocultar la pantalla de introducción
+      document.getElementById("introSection").style.display = "none";
+      // Mostrar el contenedor principal del juego
+      document.querySelector(".contenedor").style.display = "block";
+    });
+
     /*********************** SECCIÓN DE HISTORIA ************************/
     const storyParts = [
       { texto: "Había una vez una liebre muy rápida y una tortuga muy perseverante.", imagen: "1.png" },
@@ -139,7 +175,7 @@
 
     function showStoryPart() {
       storyContentDiv.innerHTML = "<p>" + storyParts[currentStoryIndex].texto + "</p>";
-      // Para evitar caché, se añade un parámetro
+      // Evitar caché añadiendo un parámetro a la imagen
       storyImage.src = storyParts[currentStoryIndex].imagen + "?v=" + new Date().getTime();
       storyButton.textContent = (currentStoryIndex === storyParts.length - 1) ? "Iniciar Preguntas" : "Continuar";
     }
@@ -252,7 +288,7 @@
 
     // Variables para llevar la cuenta de movimientos (cada pregunta equivale a 1 movimiento)
     let currentQuestion = 0;
-    const totalMoves = 10; // Se terminará el juego al alcanzar 10 movimientos en cualquiera de las dos
+    const totalMoves = 10; // Se termina el juego al alcanzar 10 movimientos en cualquiera de las dos
     let tortugaPos = 0;
     let liebrePos = 0;
     const trackWidth = 600; // Debe coincidir con el ancho de #raceTrack
@@ -292,7 +328,6 @@
         let pos = (tortugaPos / totalMoves) * trackWidth;
         tortuga.style.left = pos + "px";
         setTimeout(() => {
-          // Si la tortuga ya llegó a la meta, termina el juego
           if (tortugaPos >= totalMoves) {
             finishGame();
           } else {
@@ -307,7 +342,6 @@
         liebrePos++;
         let pos = (liebrePos / totalMoves) * trackWidth;
         liebre.style.left = pos + "px";
-        // Si la liebre ya llegó a la meta, termina el juego inmediatamente
         if (liebrePos >= totalMoves) {
           finishGame();
         }
@@ -317,7 +351,6 @@
     function finishGame() {
       const questionContainer = document.getElementById("questionContainer");
       const optionsContainer = document.getElementById("optionsContainer");
-      // Desactivar todos los botones
       document.querySelectorAll("#optionsContainer button").forEach(b => b.disabled = true);
       
       if (tortugaPos >= totalMoves) {
@@ -328,7 +361,6 @@
         optionsContainer.innerHTML = "<button id='resetButton'>Reiniciar Quiz</button>";
         document.getElementById("resetButton").addEventListener("click", resetQuiz);
       } else {
-        // Si se contestaron todas las preguntas sin que alguien llegara a 10, se compara quién avanzó más.
         if (tortugaPos >= liebrePos) {
           document.getElementById("audioSuccess").play();
           questionContainer.innerHTML = "<h2>¡Enhorabuena!</h2><p>La tortuga ha ganado la carrera. La perseverancia paga.</p>";
